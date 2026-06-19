@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Hoa tươi cho những khoảnh khắc đáng nhớ.">
+  <title>Tiệm Hoa An Nhiên</title>
+  <link rel="preconnect" href="https://images.unsplash.com">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Về đầu trang">
+      <span class="brand-mark" aria-hidden="true">✿</span>
+      <span><strong id="brandName">Tiệm Hoa An Nhiên</strong><small id="brandTagline">Gửi hoa, gửi cả yêu thương</small></span>
+    </a>
+    <a class="header-call" id="headerPhone" href="tel:0901234567">Đặt hoa: 0901 234 567</a>
+  </header>
+
+  <nav class="category-nav" aria-label="Danh mục hoa"><div id="tabMenu" class="nav-inner"></div></nav>
+
+  <main id="top">
+    <section class="hero" id="hero">
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <p class="eyebrow">Hoa tươi mỗi ngày</p>
+        <h1>Trao một bó hoa,<br>giữ một khoảnh khắc</h1>
+        <p>Những thiết kế hoa tinh tế, được kết thủ công và giao tận nơi trong ngày.</p>
+        <a class="primary-button" href="#collection">Khám phá bộ sưu tập</a>
+      </div>
+    </section>
+
+    <section class="service-strip" aria-label="Dịch vụ nổi bật">
+      <div><strong>Hoa tươi tuyển chọn</strong><span>Nhập mới mỗi ngày</span></div>
+      <div><strong>Thiết kế thủ công</strong><span>Theo câu chuyện của bạn</span></div>
+      <div><strong>Giao hoa tận nơi</strong><span>Nhanh chóng và cẩn thận</span></div>
+    </section>
+
+    <section class="collection" id="collection">
+      <div class="section-heading">
+        <p class="eyebrow">Bộ sưu tập</p>
+        <h2 id="sectionTitle">Hoa bán chạy</h2>
+        <p id="sectionIntro">Chọn một thiết kế phù hợp với điều bạn muốn gửi trao.</p>
+      </div>
+      <div class="product-grid" id="productGrid"></div>
+      <p class="empty-state" id="emptyState" hidden>Danh mục này đang được cập nhật.</p>
+    </section>
+
+    <section class="story">
+      <div class="story-copy">
+        <p class="eyebrow">Từ tiệm hoa nhỏ</p>
+        <h2>Mỗi bó hoa là một lời nhắn riêng</h2>
+        <p>Chúng tôi tin hoa đẹp nhất khi mang đúng cảm xúc của người tặng. Vì vậy, từng cành hoa đều được chọn lựa và sắp đặt với sự chăm chút.</p>
+        <a id="storyPhone" class="text-link" href="tel:0901234567">Gọi để được tư vấn →</a>
+      </div>
+      <img src="https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=1200&q=85" alt="Nghệ nhân đang chuẩn bị một bó hoa">
+    </section>
+  </main>
+
+  <footer>
+    <div><strong id="footerName">Tiệm Hoa An Nhiên</strong><p id="footerAddress">12 Đường Hoa, Quận 1, TP. Hồ Chí Minh</p></div>
+    <div class="footer-contact"><span>Nhận đặt hoa mỗi ngày</span><a id="footerPhone" href="tel:0901234567">0901 234 567</a></div>
+  </footer>
+
+  <script src="data/flowers.js"></script>
+  <script>
+    (() => {
+      const data = window.FLOWER_DATA || { site: {}, tabs: [] };
+      const site = data.site || {};
+      const tabs = Array.isArray(data.tabs) ? data.tabs : [];
+      const menu = document.querySelector('#tabMenu');
+      const grid = document.querySelector('#productGrid');
+      const empty = document.querySelector('#emptyState');
+      const money = new Intl.NumberFormat('vi-VN');
+
+      const phoneHref = `tel:${String(site.phone || '').replace(/\D/g, '')}`;
+      document.title = site.name || 'Tiệm Hoa';
+      document.querySelector('#brandName').textContent = site.name || 'Tiệm Hoa';
+      document.querySelector('#footerName').textContent = site.name || 'Tiệm Hoa';
+      document.querySelector('#brandTagline').textContent = site.tagline || '';
+      document.querySelector('#footerAddress').textContent = site.address || '';
+      ['headerPhone', 'storyPhone', 'footerPhone'].forEach(id => document.querySelector(`#${id}`).href = phoneHref);
+      document.querySelector('#headerPhone').textContent = `Đặt hoa: ${site.phone || ''}`;
+      document.querySelector('#footerPhone').textContent = site.phone || '';
+      if (site.heroImage) document.querySelector('#hero').style.backgroundImage = `url("${site.heroImage}")`;
+
+      function render(tab) {
+        document.querySelector('#sectionTitle').textContent = tab?.title || 'Bộ sưu tập hoa';
+        grid.replaceChildren();
+        const items = Array.isArray(tab?.items) ? tab.items : [];
+        empty.hidden = items.length > 0;
+        items.forEach(item => {
+          const article = document.createElement('article');
+          article.className = 'product-card';
+          const image = document.createElement('img');
+          image.src = item.thumbnail || '';
+          image.alt = item.title || 'Hoa tươi';
+          image.loading = 'lazy';
+          const body = document.createElement('div');
+          body.className = 'product-body';
+          const title = document.createElement('h3');
+          title.textContent = item.title || '';
+          const content = document.createElement('p');
+          content.textContent = item.content || '';
+          const bottom = document.createElement('div');
+          bottom.className = 'product-bottom';
+          const price = document.createElement('strong');
+          price.textContent = item.price ? `${money.format(item.price)} đ` : 'Liên hệ';
+          const order = document.createElement('a');
+          order.href = phoneHref;
+          order.textContent = 'Đặt hoa';
+          bottom.append(price, order);
+          body.append(title, content, bottom);
+          article.append(image, body);
+          grid.append(article);
+        });
+        menu.querySelectorAll('button').forEach(button => button.classList.toggle('active', button.dataset.id === tab?.id));
+      }
+
+      tabs.forEach((tab, index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset.id = tab.id;
+        button.textContent = tab.title;
+        button.addEventListener('click', () => {
+          render(tab);
+          document.querySelector('#collection').scrollIntoView({ behavior: 'smooth' });
+        });
+        menu.append(button);
+        if (index === 0) button.classList.add('active');
+      });
+      render(tabs[0]);
+    })();
+  </script>
+</body>
+</html>
