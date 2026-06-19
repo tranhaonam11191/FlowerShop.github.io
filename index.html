@@ -23,9 +23,9 @@
     <section class="hero" id="hero">
       <div class="hero-overlay"></div>
       <div class="hero-content">
-        <p class="eyebrow">Hoa tươi mỗi ngày</p>
-        <h1>Trao một bó hoa,<br>giữ một khoảnh khắc</h1>
-        <p>Những thiết kế hoa tinh tế, được kết thủ công và giao tận nơi trong ngày.</p>
+        <p class="eyebrow" id="heroEyebrow">Hoa tươi mỗi ngày</p>
+        <h1 id="heroTitle">Trao một bó hoa,<br>giữ một khoảnh khắc</h1>
+        <p id="heroDescription">Những thiết kế hoa tinh tế, được kết thủ công và giao tận nơi trong ngày.</p>
         <a class="primary-button" href="#collection">Khám phá bộ sưu tập</a>
       </div>
     </section>
@@ -49,11 +49,11 @@
     <section class="story">
       <div class="story-copy">
         <p class="eyebrow">Từ tiệm hoa nhỏ</p>
-        <h2>Mỗi bó hoa là một lời nhắn riêng</h2>
-        <p>Chúng tôi tin hoa đẹp nhất khi mang đúng cảm xúc của người tặng. Vì vậy, từng cành hoa đều được chọn lựa và sắp đặt với sự chăm chút.</p>
+        <h2 id="storyTitle">Mỗi bó hoa là một lời nhắn riêng</h2>
+        <p id="storyContent">Chúng tôi tin hoa đẹp nhất khi mang đúng cảm xúc của người tặng. Vì vậy, từng cành hoa đều được chọn lựa và sắp đặt với sự chăm chút.</p>
         <a id="storyPhone" class="text-link" href="tel:0901234567">Gọi để được tư vấn →</a>
       </div>
-      <img src="https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=1200&q=85" alt="Nghệ nhân đang chuẩn bị một bó hoa">
+      <img id="storyImage" src="https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=1200&q=85" alt="Nghệ nhân đang chuẩn bị một bó hoa">
     </section>
   </main>
 
@@ -74,11 +74,41 @@
       const money = new Intl.NumberFormat('vi-VN');
 
       const phoneHref = `tel:${String(site.phone || '').replace(/\D/g, '')}`;
+      function googleFormLink(item) {
+        const formUrl = String(site.googleFormUrl || '').trim();
+        if (!formUrl) return phoneHref;
+        try {
+          const url = new URL(formUrl);
+          const addValue = (entry, value) => {
+            const key = String(entry || '').trim();
+            if (key) url.searchParams.set(key.startsWith('entry.') ? key : `entry.${key}`, value);
+          };
+          addValue(site.googleFormTitleEntry, item.title || '');
+          addValue(site.googleFormPriceEntry, Number(item.price || 0));
+          return url.toString();
+        } catch {
+          return formUrl;
+        }
+      }
+      function externalLink(value) {
+        try {
+          const url = new URL(String(value || '').trim());
+          return ['http:', 'https:'].includes(url.protocol) ? url.toString() : '';
+        } catch {
+          return '';
+        }
+      }
       document.title = site.name || 'Tiệm Hoa';
       document.querySelector('#brandName').textContent = site.name || 'Tiệm Hoa';
       document.querySelector('#footerName').textContent = site.name || 'Tiệm Hoa';
       document.querySelector('#brandTagline').textContent = site.tagline || '';
       document.querySelector('#footerAddress').textContent = site.address || '';
+      document.querySelector('#heroEyebrow').textContent = site.heroEyebrow || 'Hoa tươi mỗi ngày';
+      document.querySelector('#heroTitle').innerHTML = String(site.heroTitle || 'Trao một bó hoa,\ngiữ một khoảnh khắc').replace(/\n/g, '<br>');
+      document.querySelector('#heroDescription').textContent = site.heroDescription || '';
+      document.querySelector('#storyTitle').textContent = site.storyTitle || '';
+      document.querySelector('#storyContent').textContent = site.storyContent || '';
+      if (site.storyImage) document.querySelector('#storyImage').src = site.storyImage;
       ['headerPhone', 'storyPhone', 'footerPhone'].forEach(id => document.querySelector(`#${id}`).href = phoneHref);
       document.querySelector('#headerPhone').textContent = `Đặt hoa: ${site.phone || ''}`;
       document.querySelector('#footerPhone').textContent = site.phone || '';
@@ -107,10 +137,32 @@
           const price = document.createElement('strong');
           price.textContent = item.price ? `${money.format(item.price)} đ` : 'Liên hệ';
           const order = document.createElement('a');
-          order.href = phoneHref;
+          order.href = googleFormLink(item);
           order.textContent = 'Đặt hoa';
+          if (site.googleFormUrl) {
+            order.target = '_blank';
+            order.rel = 'noopener';
+          }
           bottom.append(price, order);
           body.append(title, content, bottom);
+          const socialLinks = [
+            ['Zalo', externalLink(item.zaloUrl)],
+            ['Facebook', externalLink(item.facebookUrl)]
+          ].filter(([, url]) => url);
+          if (socialLinks.length) {
+            const social = document.createElement('div');
+            social.className = 'social-links';
+            social.setAttribute('aria-label', 'Liên hệ qua mạng xã hội');
+            socialLinks.forEach(([label, url]) => {
+              const link = document.createElement('a');
+              link.href = url;
+              link.target = '_blank';
+              link.rel = 'noopener';
+              link.textContent = label;
+              social.append(link);
+            });
+            body.append(social);
+          }
           article.append(image, body);
           grid.append(article);
         });

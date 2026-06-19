@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Công cụ quản lý FlowerWeb</title>
+  <style>
+    :root{--ink:#252521;--muted:#6f716c;--paper:#f6f7f4;--panel:#fff;--line:#dfe3dc;--green:#365f49;--rose:#a63f55;--danger:#b42318}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.5 Arial,sans-serif}button,input,textarea{font:inherit}.topbar{height:64px;padding:0 22px;display:flex;align-items:center;justify-content:space-between;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}.topbar h1{font:22px Georgia,serif;margin:0}.actions{display:flex;gap:8px}.btn{border:1px solid var(--line);background:#fff;padding:9px 13px;cursor:pointer}.btn.primary{background:var(--green);border-color:var(--green);color:#fff}.btn.danger{color:var(--danger)}.workspace{display:grid;grid-template-columns:250px minmax(420px,720px) minmax(300px,1fr);min-height:calc(100vh - 64px)}.sidebar,.preview{background:#fff}.sidebar{border-right:1px solid var(--line);padding:20px 14px}.sidebar-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.sidebar-title strong{text-transform:uppercase;font-size:11px;color:var(--muted)}.icon-btn{width:32px;height:32px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:20px}.menu-list{display:grid;gap:5px}.menu-row{display:flex;gap:4px}.menu-row button:first-child{flex:1;text-align:left;border:0;background:transparent;padding:10px;cursor:pointer}.menu-row.active button:first-child{background:#edf2ee;color:var(--green);font-weight:bold}.editor{padding:28px;overflow:auto}.editor h2{font:28px Georgia,serif;margin:0 0 20px}.section{padding:20px 0;border-bottom:1px solid var(--line)}.section:first-of-type{padding-top:0}.section h3{margin:0 0 14px;font-size:15px}.fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{display:grid;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:12px;font-weight:bold;color:#50534e}.field input,.field textarea{width:100%;border:1px solid #cfd5cc;background:#fff;padding:10px}.field textarea{min-height:86px;resize:vertical}.image-field{display:grid;grid-template-columns:1fr auto;gap:8px}.upload{position:relative;overflow:hidden}.upload input{position:absolute;inset:0;opacity:0;cursor:pointer}.articles{display:grid;gap:14px}.article{background:#fff;border:1px solid var(--line);padding:16px}.article-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.article-head strong{font-family:Georgia,serif;font-size:17px}.article img{width:100%;height:150px;object-fit:cover;background:#eee;margin-top:10px}.preview{border-left:1px solid var(--line);padding:20px;position:sticky;top:64px;height:calc(100vh - 64px);overflow:auto}.preview h2{font-size:12px;text-transform:uppercase;color:var(--muted);margin:0 0 12px}.preview-hero{height:220px;background:center/cover;border:1px solid var(--line);display:flex;align-items:end}.preview-hero div{width:100%;padding:20px;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.7))}.preview-hero h3{font:26px Georgia,serif;margin:0}.preview-tabs{display:flex;overflow:auto;border-bottom:1px solid var(--line)}.preview-tabs span{padding:10px;white-space:nowrap}.preview-tabs .active{color:var(--rose);border-bottom:2px solid var(--rose)}.preview-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}.preview-card{border:1px solid var(--line);background:#fff}.preview-card img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}.preview-card div{padding:10px}.preview-card strong,.preview-card small{display:block}.preview-card small{color:var(--muted)}.status{position:fixed;right:20px;bottom:20px;background:#20251f;color:#fff;padding:10px 14px;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none}.status.show{opacity:1;transform:none}@media(max-width:1050px){.workspace{grid-template-columns:220px 1fr}.preview{display:none}}@media(max-width:700px){.topbar{height:auto;align-items:flex-start;gap:12px;padding:14px;flex-direction:column}.actions{width:100%;overflow:auto}.workspace{display:block}.sidebar{border:0;border-bottom:1px solid var(--line)}.menu-list{display:flex;overflow:auto}.menu-row{min-width:150px}.editor{padding:20px 14px}.fields{grid-template-columns:1fr}.field.full{grid-column:auto}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <h1>Quản lý FlowerWeb</h1>
+    <div class="actions">
+      <button class="btn" id="openButton" type="button">Mở flowers.js</button>
+      <button class="btn" id="downloadButton" type="button">Tải flowers.js</button>
+      <button class="btn primary" id="saveButton" type="button">Lưu flowers.js</button>
+    </div>
+  </header>
+  <div class="workspace">
+    <aside class="sidebar">
+      <div class="sidebar-title"><strong>Menu website</strong><button class="icon-btn" id="addTab" type="button" title="Thêm menu">+</button></div>
+      <div class="menu-list" id="menuList"></div>
+    </aside>
+    <main class="editor">
+      <h2>Nội dung website</h2>
+      <section class="section">
+        <h3>Thông tin cửa hàng</h3>
+        <div class="fields" id="siteFields"></div>
+      </section>
+      <section class="section" id="tabEditor"></section>
+    </main>
+    <aside class="preview"><h2>Xem trước nội dung</h2><div id="preview"></div></aside>
+  </div>
+  <div class="status" id="status"></div>
+  <input id="fileInput" type="file" accept=".js,.json,application/json" hidden>
+  <script src="../data/flowers.js"></script>
+  <script>
+    (() => {
+      let data = structuredClone(window.FLOWER_DATA || {site:{},tabs:[]});
+      let activeTab = 0;
+      let fileHandle = null;
+      const $ = selector => document.querySelector(selector);
+      const esc = value => String(value ?? '').replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+      const slugify = value => String(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/đ/g,'d').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') || `muc-${Date.now()}`;
+      const fields = [
+        ['name','Tên cửa hàng'],['tagline','Khẩu hiệu'],['phone','Số điện thoại'],['address','Địa chỉ'],
+        ['googleFormUrl','URL Google Form'],['googleFormTitleEntry','Mã trường tiêu đề (entry.xxxxx)'],['googleFormPriceEntry','Mã trường giá (entry.xxxxx)'],
+        ['heroEyebrow','Dòng nhỏ hero'],['heroTitle','Tiêu đề hero'],['heroDescription','Mô tả hero'],['heroImage','Ảnh nền hero','image'],
+        ['storyTitle','Tiêu đề câu chuyện'],['storyContent','Nội dung câu chuyện','textarea'],['storyImage','Ảnh câu chuyện','image']
+      ];
+
+      function toast(message){const el=$('#status');el.textContent=message;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200)}
+      function imageInput(path,value){return `<div class="image-field"><input data-path="${path}" value="${esc(value)}" placeholder="Dán URL ảnh"><label class="btn upload">Chọn ảnh<input type="file" accept="image/*" data-image-path="${path}"></label></div>`}
+      function fieldHtml(key,label,type='text'){
+        const value=data.site[key]||'';
+        const control=type==='textarea'?`<textarea data-site="${key}">${esc(value)}</textarea>`:type==='image'?imageInput(`site.${key}`,value):`<input data-site="${key}" value="${esc(value)}">`;
+        return `<div class="field ${type==='textarea'||type==='image'?'full':''}"><label>${label}</label>${control}</div>`;
+      }
+      function renderSite(){ $('#siteFields').innerHTML=fields.map(field=>fieldHtml(...field)).join('') }
+      function renderMenu(){
+        $('#menuList').innerHTML=data.tabs.map((tab,index)=>`<div class="menu-row ${index===activeTab?'active':''}"><button type="button" data-select-tab="${index}">${esc(tab.title||'Menu mới')}</button><button class="icon-btn" type="button" data-delete-tab="${index}" title="Xóa menu">×</button></div>`).join('');
+      }
+      function renderTab(){
+        const tab=data.tabs[activeTab];
+        if(!tab){$('#tabEditor').innerHTML='<p>Hãy thêm menu đầu tiên.</p>';return}
+        const articles=(tab.items||[]).map((item,index)=>`<article class="article"><div class="article-head"><strong>Bài ${index+1}</strong><button class="btn danger" type="button" data-delete-item="${index}">Xóa bài</button></div><div class="fields"><div class="field"><label>Tiêu đề</label><input data-item="${index}" data-key="title" value="${esc(item.title)}"></div><div class="field"><label>Giá (VNĐ)</label><input type="number" min="0" data-item="${index}" data-key="price" value="${esc(item.price)}"></div><div class="field full"><label>Nội dung bài viết</label><textarea data-item="${index}" data-key="content">${esc(item.content)}</textarea></div><div class="field"><label>Link Zalo</label><input type="url" data-item="${index}" data-key="zaloUrl" value="${esc(item.zaloUrl)}" placeholder="https://zalo.me/..."></div><div class="field"><label>Link Facebook</label><input type="url" data-item="${index}" data-key="facebookUrl" value="${esc(item.facebookUrl)}" placeholder="https://facebook.com/..."></div><div class="field full"><label>Ảnh thumbnail</label>${imageInput(`item.${index}.thumbnail`,item.thumbnail||'')}<img src="${esc(item.thumbnail)}" alt=""></div></div></article>`).join('');
+        $('#tabEditor').innerHTML=`<h3>Menu đang chọn</h3><div class="fields"><div class="field"><label>Tên menu</label><input data-tab-key="title" value="${esc(tab.title)}"></div><div class="field"><label>Đường dẫn ngắn</label><input data-tab-key="slug" value="${esc(tab.slug)}"></div></div><div class="article-head" style="margin-top:24px"><h3 style="margin:0">Bài viết trong menu</h3><button class="btn primary" id="addItem" type="button">+ Thêm bài</button></div><div class="articles">${articles||'<p>Menu này chưa có bài viết.</p>'}</div>`;
+      }
+      function renderPreview(){
+        const site=data.site||{}, tab=data.tabs[activeTab], items=tab?.items||[];
+        $('#preview').innerHTML=`<div class="preview-hero" style="background-image:url('${esc(site.heroImage)}')"><div><small>${esc(site.heroEyebrow)}</small><h3>${esc(site.heroTitle)}</h3></div></div><div class="preview-tabs">${data.tabs.map((t,i)=>`<span class="${i===activeTab?'active':''}">${esc(t.title)}</span>`).join('')}</div><div class="preview-grid">${items.map(item=>`<div class="preview-card"><img src="${esc(item.thumbnail)}" alt=""><div><strong>${esc(item.title)}</strong><small>${Number(item.price||0).toLocaleString('vi-VN')} đ</small></div></div>`).join('')}</div>`;
+      }
+      function render(){renderSite();renderMenu();renderTab();renderPreview()}
+      function setPath(path,value){
+        const parts=path.split('.');
+        if(parts[0]==='site') data.site[parts[1]]=value;
+        if(parts[0]==='item') data.tabs[activeTab].items[Number(parts[1])][parts[2]]=value;
+      }
+      function output(){return `window.FLOWER_DATA = ${JSON.stringify(data,null,2)};\n`}
+      function download(){const link=document.createElement('a');link.href=URL.createObjectURL(new Blob([output()],{type:'text/javascript;charset=utf-8'}));link.download='flowers.js';link.click();URL.revokeObjectURL(link.href);toast('Đã tải flowers.js')}
+      async function save(){
+        if(!window.showSaveFilePicker){download();return}
+        try{fileHandle=fileHandle||await window.showSaveFilePicker({suggestedName:'flowers.js',types:[{description:'JavaScript',accept:{'text/javascript':['.js']}}]});const writable=await fileHandle.createWritable();await writable.write(output());await writable.close();toast('Đã lưu flowers.js')}catch(error){if(error.name!=='AbortError')toast('Không thể lưu tệp')}
+      }
+      function parseFile(text){
+        const cleaned=text.replace(/^\s*window\.FLOWER_DATA\s*=\s*/,'').replace(/;\s*$/,'');
+        const parsed=JSON.parse(cleaned);if(!parsed.site||!Array.isArray(parsed.tabs))throw new Error('Sai cấu trúc');return parsed;
+      }
+      document.addEventListener('input',event=>{
+        const el=event.target;
+        if(el.dataset.site){data.site[el.dataset.site]=el.value;renderPreview()}
+        if(el.dataset.path){setPath(el.dataset.path,el.value);renderPreview()}
+        if(el.dataset.tabKey){const tab=data.tabs[activeTab];tab[el.dataset.tabKey]=el.value;if(el.dataset.tabKey==='title'&&!tab.slug)tab.slug=slugify(el.value);renderMenu();renderPreview()}
+        if(el.dataset.item!==undefined){const item=data.tabs[activeTab].items[Number(el.dataset.item)];item[el.dataset.key]=el.dataset.key==='price'?Number(el.value):el.value;renderPreview()}
+      });
+      document.addEventListener('change',event=>{
+        const input=event.target;if(!input.dataset.imagePath||!input.files[0])return;
+        const reader=new FileReader();reader.onload=()=>{setPath(input.dataset.imagePath,reader.result);render();toast('Đã thay ảnh')};reader.readAsDataURL(input.files[0]);
+      });
+      document.addEventListener('click',event=>{
+        const button=event.target.closest('button');if(!button)return;
+        if(button.dataset.selectTab!==undefined){activeTab=Number(button.dataset.selectTab);render()}
+        if(button.dataset.deleteTab!==undefined){if(!confirm('Xóa menu và toàn bộ bài viết bên trong?'))return;data.tabs.splice(Number(button.dataset.deleteTab),1);activeTab=Math.max(0,Math.min(activeTab,data.tabs.length-1));render()}
+        if(button.dataset.deleteItem!==undefined){if(!confirm('Xóa bài viết này?'))return;data.tabs[activeTab].items.splice(Number(button.dataset.deleteItem),1);render()}
+        if(button.id==='addItem'){data.tabs[activeTab].items.push({id:`bai-${Date.now()}`,title:'Bài viết mới',price:0,thumbnail:'',content:'',zaloUrl:'',facebookUrl:''});render()}
+      });
+      $('#addTab').addEventListener('click',()=>{data.tabs.push({id:`menu-${Date.now()}`,title:'Menu mới',slug:`menu-${Date.now()}`,items:[]});activeTab=data.tabs.length-1;render()});
+      $('#downloadButton').addEventListener('click',download);
+      $('#saveButton').addEventListener('click',save);
+      $('#openButton').addEventListener('click',()=>$('#fileInput').click());
+      $('#fileInput').addEventListener('change',async event=>{try{data=parseFile(await event.target.files[0].text());activeTab=0;render();toast('Đã mở dữ liệu')}catch{toast('Tệp không đúng định dạng')}});
+      render();
+    })();
+  </script>
+</body>
+</html>

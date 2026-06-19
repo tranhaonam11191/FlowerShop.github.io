@@ -4,7 +4,16 @@ window.FLOWER_DATA = {
     "tagline": "Gửi hoa, gửi cả yêu thương",
     "phone": "0901 234 567",
     "address": "12 Đường Hoa, Quận 1, TP. Hồ Chí Minh",
-    "heroImage": "https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=2000&q=90"
+    "googleFormUrl": "",
+    "googleFormTitleEntry": "",
+    "googleFormPriceEntry": "",
+    "heroImage": "https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=2000&q=90",
+    "heroEyebrow": "Hoa tươi mỗi ngày",
+    "heroTitle": "Trao một bó hoa,\ngiữ một khoảnh khắc",
+    "heroDescription": "Những thiết kế hoa tinh tế, được kết thủ công và giao tận nơi trong ngày.",
+    "storyTitle": "Mỗi bó hoa là một lời nhắn riêng",
+    "storyContent": "Chúng tôi tin hoa đẹp nhất khi mang đúng cảm xúc của người tặng. Vì vậy, từng cành hoa đều được chọn lựa và sắp đặt với sự chăm chút.",
+    "storyImage": "https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=1200&q=85"
   },
   "tabs": [
     {
